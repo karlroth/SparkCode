@@ -8,6 +8,5 @@ TODO:
 
 All spark code run in the Amazon EMR environment.
 
-_DISCLAIMER:_
-
+## DISCLAIMER:
 These code examples alternate between using SparkSQL and DataFrame operations (often within the same file). I acknowledge that this might not be the best coding practice; this was done for my own learning purposes. 
