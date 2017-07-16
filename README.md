@@ -1,4 +1,4 @@
-# RDII SparkCode
+# RDII Apache Spark
 All Code written for processing D3S detector data
 
 TODO:
