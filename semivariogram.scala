@@ -1,0 +1,2 @@
+semivariogram.scala
+
