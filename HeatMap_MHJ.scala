@@ -7,8 +7,11 @@ import org.joda.time.{DateTimeZone}
 import org.joda.time.format.DateTimeFormat
 import org.apache.spark.sql.functions.round
 import org.apache.spark.sql.DataFrameStatFunctions
+import org.apache.spark.sql.types.IntegerType
 
 import org.apache.spark.SparkContext._
+
+
 
 val file = "s3://myeonghun/radiation_data_201601_20160510/radiation.csv"
 val sqlContext = new org.apache.spark.sql.SQLContext(sc)
@@ -64,16 +67,18 @@ step3.registerTempTable("Filtered")
 val step4 = sqlContext.sql("SELECT * FROM Filtered ORDER BY Time")
 
 //generate new records based on latitude and longitude key.
-val step5 = step4.withColumn("lonKey", ($"roundedLon" + 88.227652)/0.0001).withColumn("latKey", ($"roundedLat" - 40.111471)/0.001) 
+val step5 = step4.withColumn("lonKey", (($"roundedLon" + 88.227652)/0.0005).cast(IntegerType)).withColumn("latKey22", (($"roundedLat" - 40.111471)/0.0005).cast(IntegerType))
+//val step5_int = step5.withColumn("lonKey",step5.lon.cast(IntegerType)).drop("lon").withColumn("latKey",step5.lat.cast(IntegerType)).drop("lat")
+
 step5.registerTempTable("Keys")
 
-val step5_avg = sqlContext.sql("SELECT latKey,lonKey,AVG(Sigma) AS avgSigma FROM Keys GROUP BY (latKey,lonKey)")
+val step5_avg = sqlContext.sql("SELECT latKey,lonKey,AVG(Sigma) AS avgSigma FROM Keys GROUP BY latKey,lonKey")
 
 //To save the file, it is easiest to convert these to an RDD and save as text file:
 step5_avg.cache()
 val result = step5_avg.rdd
 
-step5_avg.saveAsTextFile("oneDetector2.txt")
+result.saveAsTextFile("oneDetector2.txt")
 // This will save these files into hdfs.  To find and get them:
 // hadoop fs -ls
 // hadoop fs -get det.txt
