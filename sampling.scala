@@ -1,8 +1,9 @@
-/*
- Feb 2, 2017Karl Roth
- 
- This purpose of this program is sample a dataset for the purposes of testing and training algotrithms. 
-*/
+/**
+ * @author Karl Roth
+ * @since Feb 2, 2018
+ * 
+ * This purpose of this program is sample a dataset for the purposes of testing and training algotrithms. 
+ */
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.Column

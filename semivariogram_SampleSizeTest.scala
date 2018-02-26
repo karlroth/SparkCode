@@ -1,13 +1,18 @@
-/* 
-Karl Roth
-
-The semivariogram is the most computationally intensive step of the Kriging process. 
-In order to parallelize this we must determine how large of a dataset this function can
-perform before crashing. 
-The dataset to be sampled will be from the single day March 11, 2016. 
-This day was chosen because it has the most data to work
-with of any given day. 337455 data points, with clear weather. 
-*/
+/** 
+ * @author Karl Roth
+ *
+ * The semivariogram is the most computationally intensive step of the Kriging process. 
+ * In order to parallelize this we must determine how large of a dataset this function can
+ * perform before crashing. 
+ * The dataset to be sampled will be from the single day March 11, 2016. 
+ * This day was chosen because it has the most data to work
+ * with of any given day. 337455 data points, with clear weather. 
+ *
+ *
+ * To load third party packages run:
+ * $ spark-shell --packages=org.locationtech.geotrellis:geotrellis-vector_2.11:1.0.0
+ *
+ */
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.Column
@@ -38,25 +43,26 @@ val df2 = df.select("_c0", "_c1","_c2","_c3","_c5")
 val newNames = Seq("ID", "Latitude", "Longitude", "Sigma","Time")
 val df3 = df2.toDF(newNames: _*)
 
-/* Retrieve data only from UIUC Engineering Campus
-*  for the day March 11, 2016 with non-negative counts 
-*/
+/**
+ * Retrieve data only from UIUC Engineering Campus
+ *  for the day March 11, 2016 with non-negative counts 
+ */
 val df_clean = df3.filter($"Sigma" > 0).filter($"Latitude" > 40.109028).filter($"Latitude" < 40.116430).filter($"Longitude" > -88.230338).filter($"Longitude" < -88.223750).filter($"Time" > 1457676000).filter($"Time" < 1457762400)
 
-//Convert from unix to dd-MM-yyyy, and round the latitude and longitude 
+/* Convert from unix to dd-MM-yyyy, and round the latitude and longitude */
 val df_formated = df_clean.withColumn("day", from_unixtime($"Time", "dd-MM-yyyy ")).withColumn("localTime", from_unixtime($"Time", "HH:mm:ss")).withColumn("roundedLat", round($"Latitude", 5)).withColumn("roundedLon", round($"Longitude", 5))
 
 /* The raw data to be sampled */
 val rawData = df_formated
 
-/*
- Now this filtered data will be sampled using the SparkSampling class.
- This sampling function takes three variables:
- 	
- 	1. is the sampling done with replacement
- 	2. the sample size as a fraction
- 	3. optional, random seed.
-*/
+/**
+ * Now this filtered data will be sampled using the SparkSampling class.
+ * This sampling function takes three variables:
+ *	
+ *   1. is the sampling done with replacement
+ *	 2. the sample size as a fraction
+ *	 3. optional, random seed.
+ */
 
 /* Sample the raw data */
 val sampleData = rawData.sample(false, 0.01, 1234);
@@ -66,12 +72,12 @@ val rawDataSize = rawData.count();
 System.out.println(rawDataSize + " and after the sampling: " + sampleDataSize);
 
 
-/* 
-It's important to note that after sampling the DataSet is converted from org.apache.spark.sql.Dataset[(Double, Double, Double, Int)] 
-to org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] 
-
-This means that when mapping we will have to use value.getDouble(1) instead of value._1 to access the elements of the RDD[Row]
-*/
+/** 
+ * It's important to note that after sampling the DataSet is converted from org.apache.spark.sql.Dataset[(Double, Double, Double, Int)] 
+ * to org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] 
+ *
+ * This means that when mapping we will have to use value.getDouble(1) instead of value._1 to access the elements of the RDD[Row]
+ */
 
 //Input data points 
 val rdd1 = sampleData.rdd.map(row => {
