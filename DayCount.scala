@@ -97,7 +97,7 @@ reduceDF.take(10)
  *   21-04-2016, 29521  Overcast/Fog
  *   13-01-2016, 30915  Overcast
  *
- *   20-03-2016 => ( 1457654400, 1457740799 )
+ *   20-03-2016 => ( 1458432000 to 1458518399 )
  *
  * Weather data collected from wunderground.com
  *

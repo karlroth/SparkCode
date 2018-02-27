@@ -16,8 +16,11 @@ val data = spark.read.option("inferSchema", "true").csv(file)
  *   _c2 -> longitude
  *   _c3 -> Sigma (cpm)
  *  _c5 -> Time (unix miliseconds)
+ *
+ * val wanted = data.select("_c1","_c2","_c3","_c5").as[(Double, Double, Double, Int)].filter($"_c1" > 40.10902).filter($"_c1" < 40.111495).filter($"_c2" > -88.23033).filter($"_c2" < -88.228137).filter($"_c3" > 0).filter($"_c3" < 91).filter($"_c5" >  1457676000).filter($"_c5" < 1457762400)
  */
-val wanted = data.select("_c1","_c2","_c3","_c5").as[(Double, Double, Double, Int)].filter($"_c1" > 40.10902).filter($"_c1" < 40.111495).filter($"_c2" > -88.23033).filter($"_c2" < -88.228137).filter($"_c3" > 0).filter($"_c3" < 91).filter($"_c5" >  1457676000).filter($"_c5" < 1457762400)
+/* March 20, 2016 */ 
+val wanted = data.select("_c1","_c2","_c3","_c5").as[(Double, Double, Double, Int)].filter($"_c1" > 40.10902).filter($"_c1" < 40.111495).filter($"_c2" > -88.23033).filter($"_c2" < -88.228137).filter($"_c3" > 0).filter($"_c3" < 91).filter($"_c5" >  1458432000).filter($"_c5" < 1458518399)
 
 
 
